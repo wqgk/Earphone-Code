@@ -18,17 +18,17 @@
 static volatile int nextTXDesc, countTXDescUsed;
 
 /* Number of UART RX descriptors used for DMA */
-#define UARTRXDESC 1
+#define UARTRXDESC 2
 
 /* Maximum size of each UART RX receive buffer */
-#define UARTRXBUFFSIZE  20
+#define UARTRXBUFFSIZE  8
 
 /* UART RX receive buffers */
-static uint8_t dmaRXBuffs[UARTRXBUFFSIZE];
+static uint8_t dmaRXBuffs[UARTRXDESC][UARTRXBUFFSIZE];
 /* UART receive buffer that is available and availa flag */
 static volatile int uartRXBuff;
 static volatile bool uartRxAvail = false;
-
+int j = 0;
 /* DMA descriptors must be aligned to 16 bytes */
 ALIGN(16) static DMA_CHDESC_T dmaRXDesc[UARTRXDESC];
 
@@ -83,71 +83,72 @@ static void Init_UART_PinMux(void)
 /* Setup DMA UART RX support, but do not queue descriptors yet */
 static void dmaRXSetup(void)
 {
-    /* Setup UART 0 RX channel for the following configuration:
-       - Peripheral DMA request (UART 0 RX channel)
-       - Single transfer
-       - Low channel priority */
-    Chip_DMA_EnableChannel(LPC_DMA, DMAREQ_USART0_RX);
-    Chip_DMA_EnableIntChannel(LPC_DMA, DMAREQ_USART0_RX);
-    Chip_DMA_SetupChannelConfig(LPC_DMA, DMAREQ_USART0_RX,
-                                (DMA_CFG_PERIPHREQEN | DMA_CFG_TRIGBURST_SNGL | DMA_CFG_CHPRIORITY(3)));
+	/* Setup UART 0 RX channel for the following configuration:
+	   - Peripheral DMA request (UART 0 RX channel)
+	   - Single transfer
+	   - Low channel priority */
+	Chip_DMA_EnableChannel(LPC_DMA, DMAREQ_USART0_RX);
+	Chip_DMA_EnableIntChannel(LPC_DMA, DMAREQ_USART0_RX);
+	Chip_DMA_SetupChannelConfig(LPC_DMA, DMAREQ_USART0_RX,
+								(DMA_CFG_PERIPHREQEN | DMA_CFG_TRIGBURST_SNGL | DMA_CFG_CHPRIORITY(3)));
 }
 
 /* Queue up DMA descriptors and buffers for UART RX */
 static void dmaRXQueue(void)
 {
-    int i;
+	int i;
 
-    /* Linked list of descriptors that map to the 3 receive buffers */
-    for (i = 0; i < UARTRXDESC; i++) {
-        /* Setup next descriptor */
-        if (i == (UARTRXDESC - 1)) {
-            /* Wrap descriptors */
-            dmaRXDesc[i].next = DMA_ADDR(&dmaRXDesc[0]);
-        }
-        else {
-            dmaRXDesc[i].next = DMA_ADDR(&dmaRXDesc[i + 1]);
-        }
+	/* Linked list of descriptors that map to the 3 receive buffers */
+	for (i = 0; i < UARTRXDESC; i++) {
+		/* Setup next descriptor */
+		if (i == (UARTRXDESC - 1)) {
+			/* Wrap descriptors */
+			dmaRXDesc[i].next = DMA_ADDR(&dmaRXDesc[0]);
+		}
+		else {
+			dmaRXDesc[i].next = DMA_ADDR(&dmaRXDesc[i + 1]);
+		}
 
-        /* Create a descriptor for the data */
-        dmaRXDesc[i].source = DMA_ADDR(&LPC_USART0->RXDATA) + 0;	/* Byte aligned */
-        dmaRXDesc[i].dest = DMA_ADDR(dmaRXBuffs + UARTRXBUFFSIZE - 1);
+		/* Create a descriptor for the data */
+		dmaRXDesc[i].source = DMA_ADDR(&LPC_USART0->RXDATA) + 0;	/* Byte aligned */
+		dmaRXDesc[i].dest = DMA_ADDR(&dmaRXBuffs[i][0] + UARTRXBUFFSIZE - 1);
 
-        /* Setup transfer configuration */
-        dmaRXDesc[i].xfercfg = DMA_XFERCFG_CFGVALID | DMA_XFERCFG_SETINTA |
-                               DMA_XFERCFG_WIDTH_8 | DMA_XFERCFG_SRCINC_0 |
-                               DMA_XFERCFG_DSTINC_1 | DMA_XFERCFG_RELOAD |
-                               DMA_XFERCFG_XFERCOUNT(UARTRXBUFFSIZE);
-    }
+		/* Setup transfer configuration */
+		dmaRXDesc[i].xfercfg = DMA_XFERCFG_CFGVALID | DMA_XFERCFG_SETINTA |
+							   DMA_XFERCFG_WIDTH_8 | DMA_XFERCFG_SRCINC_0 |
+							   DMA_XFERCFG_DSTINC_1 | DMA_XFERCFG_RELOAD |
+							   DMA_XFERCFG_XFERCOUNT(UARTRXBUFFSIZE);
+	}
 
-    /* Setup transfer descriptor and validate it */
-    Chip_DMA_SetupTranChannel(LPC_DMA, DMAREQ_USART0_RX, &dmaRXDesc[0]);
+	/* Setup transfer descriptor and validate it */
+	Chip_DMA_SetupTranChannel(LPC_DMA, DMAREQ_USART0_RX, &dmaRXDesc[0]);
 
-    /* Setup data transfer */
-    Chip_DMA_SetupChannelTransfer(LPC_DMA, DMAREQ_USART0_RX,
-                                  dmaRXDesc[0].xfercfg);
-    Chip_DMA_SetValidChannel(LPC_DMA, DMAREQ_USART0_RX);
-    Chip_DMA_SWTriggerChannel(LPC_DMA, DMAREQ_USART0_RX);
+	/* Setup data transfer */
+	Chip_DMA_SetupChannelTransfer(LPC_DMA, DMAREQ_USART0_RX,
+								  dmaRXDesc[0].xfercfg);
+	Chip_DMA_SetValidChannel(LPC_DMA, DMAREQ_USART0_RX);
+	Chip_DMA_SWTriggerChannel(LPC_DMA, DMAREQ_USART0_RX);
 }
 
 /* Check and return UART RX data if it exists */
-//static int checkRxData(uint8_t *buff)
-//{
-//    int bytesRec = 0;
+/* Check and return UART RX data if it exists */
+static int checkRxData(uint8_t *buff)
+{
+	int bytesRec = 0;
 
-//    if (uartRxAvail) {
-//        uartRxAvail = false;
+	if (uartRxAvail) {
+		uartRxAvail = false;
 
-//        memcpy(buff, dmaRXBuffs, UARTRXBUFFSIZE);
-//        uartRXBuff++;
-//        if (uartRXBuff >= UARTRXDESC) {
-//            uartRXBuff = 0;
-//        }
-//        bytesRec = UARTRXBUFFSIZE;
-//    }
+		memcpy(buff, dmaRXBuffs[uartRXBuff], UARTRXBUFFSIZE);
+		uartRXBuff++;
+		if (uartRXBuff >= UARTRXDESC) {
+			uartRXBuff = 0;
+		}
+		bytesRec = UARTRXBUFFSIZE;
+	}
 
-//    return bytesRec;
-//}
+	return bytesRec;
+}
 
 /* Clear an error on a DMA channel */
 static void dmaClearChannel(DMA_CHID_T ch)
@@ -177,22 +178,22 @@ void DMA_IRQHandler(void)
     errors = Chip_DMA_GetErrorIntChannels(LPC_DMA);
     pending = Chip_DMA_GetActiveIntAChannels(LPC_DMA);
 
-    /* Check DMA interrupts of UART 0 RX channel */
-    if ((errors | pending) & (1 << DMAREQ_USART0_RX)) {
-        /* Clear DMA interrupt for the channel */
-        Chip_DMA_ClearActiveIntAChannel(LPC_DMA, DMAREQ_USART0_RX);
+	/* Check DMA interrupts of UART 0 RX channel */
+	if ((errors | pending) & (1 << DMAREQ_USART0_RX)) {
+		/* Clear DMA interrupt for the channel */
+		Chip_DMA_ClearActiveIntAChannel(LPC_DMA, DMAREQ_USART0_RX);
 
-        /* Handle errors if needed */
-        if (errors & (1 << DMAREQ_USART0_RX)) {
-            /* DMA error, channel needs to be reset */
-            dmaClearChannel(DMAREQ_USART0_RX);
-            dmaRXSetup();
-            dmaRXQueue();
-        }
-        else {
-            uartRxAvail = true;
-        }
-    }
+		/* Handle errors if needed */
+		if (errors & (1 << DMAREQ_USART0_RX)) {
+			/* DMA error, channel needs to be reset */
+			dmaClearChannel(DMAREQ_USART0_RX);
+			dmaRXSetup();
+			dmaRXQueue();
+		}
+		else {
+			uartRxAvail = true;
+		}
+	}
 }
 
 /**
@@ -219,11 +220,10 @@ void MRT_IRQHandler(void)
  */
 int main(void)
 {
-    int i = 0;
-    //uint8_t bytes = 0;
-    
-	//uint8_t buff[UARTRXBUFFSIZE];
-
+    int i = 0 ,j = 0;
+    int bytes, idx;
+	uint8_t buff[UARTRXBUFFSIZE];
+	uint8_t temp[100] = {0};
     SystemCoreClockUpdate();
     Board_Init();
 
@@ -247,13 +247,14 @@ int main(void)
     dmaRXSetup();
 
     /* Enable the DMA IRQ */
-    //NVIC_EnableIRQ(DMA_IRQn);
+    NVIC_EnableIRQ(DMA_IRQn);
 
     Chip_MRT_Init();
 
     /* Set MRT timing parameter */
     Chip_MRT_SetInterval(LPC_MRT_CH1, ((SystemCoreClock / QUICKJACKCOMMUNICATIONCLK) >> 1));
-    NVIC_EnableIRQ(MRT_IRQn);
+//    NVIC_EnableIRQ(MRT_IRQn);
+//	  NVIC_DisableIRQ(MRT_IRQn);
 
     Chip_MRT_SetEnabled(LPC_MRT_CH1);
 
@@ -264,27 +265,28 @@ int main(void)
        required to flush the DMA when the DMA has pending data and no
        data has been received on the UART in a specified timeout */
     dmaRXQueue();
-    for(i = 0; i < 20; i++)
-    {
-        dmaRXBuffs[i] = '\r';
-    }
+	NVIC_EnableIRQ(MRT_IRQn);
 	QuickJack_Data_Tx(0xAA); /* HandShake Protocol AA 55 AA 55 */
 	QuickJack_Data_Tx(0x55);
 	QuickJack_Data_Tx(0xAA);
 	QuickJack_Data_Tx(0x55);	
+	myDelay(3000);
+	NVIC_DisableIRQ(MRT_IRQn);
     while (1) {
-        while(dmaRXBuffs[0] == '\r');
-        myDelay(1000);
-        //memcpy(rx_data1, dmaRXBuffs, UARTRXBUFFSIZE);
-		i = 0;
-		while(dmaRXBuffs[i] != '\r')
-		{
-			QuickJack_Data_Tx(dmaRXBuffs[i]);
-			dmaRXBuffs[i] = '\r';
-			i++;
+		/* Sleep until something happens */
+		__WFI();
+		
+		/* Did any data come in? */
+		bytes = checkRxData(buff);
+		if (bytes > 0) {
+			/* RX data received, send it via TX DMA */
+			NVIC_EnableIRQ(MRT_IRQn);
+			for(j = 0; j < 8; j++)
+			{
+//				temp[8 * i + j] = buff[j]; 
+				QuickJack_Data_Tx(buff[j]);
+			}
+			NVIC_DisableIRQ(MRT_IRQn);
 		}
-		dmaClearChannel(DMAREQ_USART0_RX);
-        dmaRXSetup();
-        dmaRXQueue();
     }
 }
