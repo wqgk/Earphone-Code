@@ -65,21 +65,9 @@ void Board_SystemInit(void);
  */
 void Board_SetupMuxing(void);
 
-/**
- * @brief	Setup system clocking
- * @return	None
- * @note	This sets up board clocking.
- */
-void Board_SetupClocking(void);
 
-/**
- * @brief	Setup external system memory
- * @return	None
- * @note	This function is typically called after pin mux setup and clock setup and
- * sets up any external memory needed by the system (DRAM, SRAM, etc.). Not all
- * boards need this function.
- */
-void Board_SetupExtMemory(void);
+void Earphone_Init(void);
+
 
 /**
  * @brief	Set up and initialize all required blocks and functions related to the board hardware.
@@ -121,39 +109,6 @@ int Board_UARTGetChar(void);
  * @return	None
  */
 void Board_UARTPutSTR(const char *str);
-
-/**
- * @brief	Sets the state of a board LED to on or off
- * @param	LEDNumber	: LED number to set state for
- * @param	State		: true for on, false for off
- * @return	None
- */
-void Board_LED_Set(uint8_t LEDNumber, bool State);
-
-/**
- * @brief	Returns the current state of a board LED
- * @param	LEDNumber	: LED number to set state for
- * @return	true if the LED is on, otherwise false
- */
-bool Board_LED_Test(uint8_t LEDNumber);
-
-/**
- * @brief	Toggles the current state of a board LED
- * @param	LEDNumber	: LED number to change state for
- * @return	None
- */
-void Board_LED_Toggle(uint8_t LEDNumber);
-
-/**
- * @brief	Turn on Board LCD Backlight
- * @param	Intensity	: Backlight intensity (0 = off, >=1 = on)
- * @return	None
- * @note	On boards where a GPIO is used to control backlight on/off state, a '0' or '1'
- * value will turn off or on the backlight. On some boards, a non-0 value will
- * control backlight intensity via a PWN. For PWM systems, the intensity value
- * is a percentage value between 0 and 100%.
- */
-void Board_SetLCDBacklight(uint8_t Intensity);
 
 /**
  * @brief Function prototype for a MS delay function. Board layers or example code may

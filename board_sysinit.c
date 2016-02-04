@@ -56,25 +56,19 @@
 void Board_SetupMuxing(void)
 {
 	/* Enable IOCON and Switch Matrix clocks */
-	Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_IOCON);
-}
-
-/* Set up and initialize clocking prior to call to main */
-void Board_SetupClocking(void)
-{
-	/* Crystal is available on the board
-	 * but not connected by default.
-	 */
-	Chip_SetupIrcClocking();
+	//Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_IOCON);
+	/* Use Switch Matrix Tool swm.c file for the Pin Enable 0 variable */
+	LPC_SWM->PINENABLE0 = 0xfffffecfUL;		/* IRC + CLKOUT on PIO0_1 + ACMP_I1 */
 }
 
 /* Set up and initialize hardware prior to call to main */
 void Board_SystemInit(void)
 {
+		/* System clock to the GPIO & the SWM & the IOCON need to be enabled or
+  most of the I/O related peripherals won't work. */
+	Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_SWM);
+	Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_GPIO);
+	Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_IOCON);
 	/* Setup system clocking and muxing */
 	Board_SetupMuxing();
-	Board_SetupClocking();
-
-	/* IOCON clock left on, but may be turned off if no other IOCON
-	   changes are needed */
 }

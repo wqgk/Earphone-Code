@@ -148,7 +148,7 @@
             <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
-          <TargetSelection>12</TargetSelection>
+          <TargetSelection>6</TargetSelection>
           <SimDlls>
             <CpuDll></CpuDll>
             <CpuDllArguments></CpuDllArguments>
@@ -162,7 +162,7 @@
             <PeripheralDll></PeripheralDll>
             <PeripheralDllArguments></PeripheralDllArguments>
             <InitializationFile></InitializationFile>
-            <Driver>BIN\CMSIS_AGDI.dll</Driver>
+            <Driver>Segger\JL2CM3.dll</Driver>
           </TargetDlls>
         </DebugOption>
         <Utilities>
@@ -172,11 +172,11 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4096</DriverSelection>
+            <DriverSelection>4099</DriverSelection>
           </Flash1>
-          <bUseTDR>1</bUseTDR>
-          <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <bUseTDR>0</bUseTDR>
+          <Flash2>Segger\JL2CM3.dll</Flash2>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -410,19 +410,19 @@
           <GroupName>dma_uart</GroupName>
           <Files>
             <File>
-              <FileName>dma_uart.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\dma_uart.c</FilePath>
-            </File>
-            <File>
               <FileName>keil_startup_lpc82x.s</FileName>
               <FileType>2</FileType>
               <FilePath>..\keil_startup_lpc82x.s</FilePath>
             </File>
             <File>
-              <FileName>readme.txt</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\readme.txt</FilePath>
+              <FileName>dma_uart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\dma_uart.c</FilePath>
+            </File>
+            <File>
+              <FileName>manchester.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\manchester.c</FilePath>
             </File>
             <File>
               <FileName>sysinit.c</FileName>
@@ -450,29 +450,9 @@
           <GroupName>chip_8xx</GroupName>
           <Files>
             <File>
-              <FileName>acmp_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\acmp_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>adc_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\adc_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>chip_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\chip_8xx.c</FilePath>
-            </File>
-            <File>
               <FileName>clock_8xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\chip_8xx\clock_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>crc_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\crc_8xx.c</FilePath>
             </File>
             <File>
               <FileName>dma_8xx.c</FileName>
@@ -485,74 +465,9 @@
               <FilePath>..\chip_8xx\gpio_8xx.c</FilePath>
             </File>
             <File>
-              <FileName>i2c_common_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\i2c_common_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>i2cm_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\i2cm_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>i2cs_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\i2cs_8xx.c</FilePath>
-            </File>
-            <File>
               <FileName>iocon_8xx.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\chip_8xx\iocon_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>irc_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\irc_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>pinint_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\pinint_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>pmu_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\pmu_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>sct_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\sct_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>sct_pwm_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\sct_pwm_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>spi_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\spi_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>spim_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\spim_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>spis_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\spis_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>stopwatch_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\stopwatch_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>swm_8xx.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_8xx\swm_8xx.c</FilePath>
             </File>
             <File>
               <FileName>syscon_8xx.c</FileName>
@@ -570,24 +485,29 @@
               <FilePath>..\chip_8xx\uart_8xx.c</FilePath>
             </File>
             <File>
-              <FileName>wkt_8xx.c</FileName>
+              <FileName>acmp_8xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\chip_8xx\wkt_8xx.c</FilePath>
+              <FilePath>..\chip_8xx\acmp_8xx.c</FilePath>
             </File>
             <File>
-              <FileName>wwdt_8xx.c</FileName>
+              <FileName>swm_8xx.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\chip_8xx\wwdt_8xx.c</FilePath>
-            </File>
-            <File>
-              <FileName>iap.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\chip_common\iap.c</FilePath>
+              <FilePath>..\chip_8xx\swm_8xx.c</FilePath>
             </File>
             <File>
               <FileName>ring_buffer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\chip_common\ring_buffer.c</FilePath>
+            </File>
+            <File>
+              <FileName>chip_8xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\chip_8xx\chip_8xx.c</FilePath>
+            </File>
+            <File>
+              <FileName>irc_8xx.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\chip_8xx\irc_8xx.c</FilePath>
             </File>
           </Files>
         </Group>

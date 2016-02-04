@@ -37,31 +37,17 @@
  * Private types/enumerations/variables
  ****************************************************************************/
 
-#define LEDSAVAIL 3
-static const uint8_t ledBits[LEDSAVAIL] = {12, 16, 27};
-
 /*****************************************************************************
  * Public types/enumerations/variables
  ****************************************************************************/
 
 /* System oscillator rate and clock rate on the CLKIN pin */
-const uint32_t OscRateIn = 12000000;
+const uint32_t OscRateIn = 0;
 const uint32_t ExtRateIn = 0;
 
 /*****************************************************************************
  * Private functions
  ****************************************************************************/
-
-/* Initialize the LEDs on the NXP LPC824 LPCXpresso Board */
-static void Board_LED_Init(void)
-{
-	int i;
-
-	for (i = 0; i < LEDSAVAIL; i++) {
-		Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, 0, ledBits[i]);
-		Chip_GPIO_SetPinState(LPC_GPIO_PORT, 0, ledBits[i], true);
-	}
-}
 
 /* Board Debug UART Initialisation function */
 STATIC void Board_UART_Init(void)
@@ -69,9 +55,9 @@ STATIC void Board_UART_Init(void)
 	/* Enable the clock to the Switch Matrix */
 	Chip_Clock_EnablePeriphClock(SYSCTL_CLOCK_SWM);
 
-	/* Connect the U0_TXD_O and U0_RXD_I signals to port pins(P0.17, P0.18) */
+	/* Connect the U0_TXD_O and U0_RXD_I signals to port pins(P0.07, P0.18) */
+	Chip_SWM_DisableFixedPin(SWM_FIXED_ADC0);
 	Chip_SWM_DisableFixedPin(SWM_FIXED_ADC8);
-	Chip_SWM_DisableFixedPin(SWM_FIXED_ADC9);
 
 	/* Enable UART Divider clock, divided by 1 */
 	Chip_Clock_SetUARTClockDiv(1);
@@ -96,34 +82,6 @@ STATIC void Board_UART_Init(void)
 /*****************************************************************************
  * Public functions
  ****************************************************************************/
-
-/* Set the LED to the state of "On" */
-void Board_LED_Set(uint8_t LEDNumber, bool On)
-{
-	if (LEDNumber < LEDSAVAIL) {
-		Chip_GPIO_SetPinState(LPC_GPIO_PORT, 0, ledBits[LEDNumber], (bool) !On);
-	}
-}
-
-/* Return the state of LEDNumber */
-bool Board_LED_Test(uint8_t LEDNumber)
-{
-	bool state = false;
-
-	if (LEDNumber < LEDSAVAIL) {
-		state = (bool) !Chip_GPIO_GetPinState(LPC_GPIO_PORT, 0, ledBits[LEDNumber]);
-	}
-
-	return state;
-}
-
-/* Toggles the current state of a board LED */
-void Board_LED_Toggle(uint8_t LEDNumber)
-{
-	if (LEDNumber < LEDSAVAIL) {
-		Chip_GPIO_SetPinToggle(LPC_GPIO_PORT, 0, ledBits[LEDNumber]);
-	}
-}
 
 /*  Classic implementation of itoa -- integer to ASCII */
 char *Board_itoa(int value, char *result, int base)
@@ -193,16 +151,29 @@ void Board_Debug_Init(void)
 #endif
 }
 
+void Earphone_Init(void)
+{
+	Chip_IOCON_PinSetMode(LPC_IOCON, IOCON_PIO14, PIN_MODE_INACTIVE);
+	Chip_GPIO_SetPinDIRInput(LPC_GPIO_PORT, 0, 14);
+	
+	Chip_IOCON_PinSetMode(LPC_IOCON, QUICKJACKTXPIN, PIN_MODE_INACTIVE);
+	Chip_GPIO_SetPinDIROutput(LPC_GPIO_PORT, 0, QUICKJACKTXPINNUM);
+	Chip_GPIO_SetPinState(LPC_GPIO_PORT, 0, QUICKJACKTXPINNUM, 1);	
+
+	Chip_Clock_DisablePeriphClock(SYSCTL_CLOCK_SWM);
+	Chip_Clock_DisablePeriphClock(SYSCTL_CLOCK_IOCON);
+}
+
+
+
 /* Set up and initialize all required blocks and functions related to the
    board hardware */
 void Board_Init(void)
 {
-	/* Sets up DEBUG UART */
-	DEBUGINIT();
 
+	Earphone_Init();
 	/* Initialize GPIO */
 	Chip_GPIO_Init(LPC_GPIO_PORT);
 
-	/* Initialize the LEDs */
-	Board_LED_Init();
+	
 }
