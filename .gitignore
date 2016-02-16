@@ -12,3 +12,4 @@
 *.crf
 *.hex
 *.htm
+keil_output/

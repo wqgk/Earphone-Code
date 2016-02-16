@@ -270,7 +270,7 @@ int main(void)
 	QuickJack_Data_Tx(0x55);
 	QuickJack_Data_Tx(0xAA);
 	QuickJack_Data_Tx(0x55);	
-	myDelay(3000);
+//	myDelay(3000);
 	NVIC_DisableIRQ(MRT_IRQn);
     while (1) {
 		/* Sleep until something happens */
