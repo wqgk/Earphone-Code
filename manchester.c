@@ -47,7 +47,7 @@ static volatile QUICKJACK_STATE_T	LastState		= QUICKJACK_IDLE;								// last tr
 
 static volatile uint8_t				TxBit;													// transfer bits
 static volatile uint8_t				SendByteTx;												// the data tranfer to Mobile
-static volatile uint8_t				IdleBit;													// how many times of transfer idle status
+volatile uint8_t				IdleBit;													// how many times of transfer idle status
 
 /*****************************************************************************
  * Public types/enumerations/variables

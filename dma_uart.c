@@ -28,7 +28,7 @@ static uint8_t dmaRXBuffs[UARTRXDESC][UARTRXBUFFSIZE];
 /* UART receive buffer that is available and availa flag */
 static volatile int uartRXBuff;
 static volatile bool uartRxAvail = false;
-int j = 0;
+extern volatile uint8_t IdleBit;													// how many times of transfer idle status
 /* DMA descriptors must be aligned to 16 bytes */
 ALIGN(16) static DMA_CHDESC_T dmaRXDesc[UARTRXDESC];
 
@@ -271,6 +271,7 @@ int main(void)
 	QuickJack_Data_Tx(0x55);	
 	myDelay(10);
 	NVIC_DisableIRQ(MRT_IRQn);
+	IdleBit = 0;
     while (1) {
 		/* Sleep until something happens */
 		__WFI();
@@ -286,6 +287,7 @@ int main(void)
 			}
 			myDelay(10);
 			NVIC_DisableIRQ(MRT_IRQn);
+			IdleBit = 0;
 		}
     }
 }
