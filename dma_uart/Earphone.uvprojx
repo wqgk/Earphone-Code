@@ -373,7 +373,7 @@
               <MiscControls></MiscControls>
               <Define>CORE_M0PLUS</Define>
               <Undefine></Undefine>
-              <IncludePath>..\board_common;..\chip_8xx;..\chip_common;..\CMSIS\Include;..\config_82x;..\..\Earphone-Code0.2</IncludePath>
+              <IncludePath>..\board_common;..\chip_8xx;..\chip_common;..\CMSIS\Include;..\config_82x;..\..\Earphone-Code</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

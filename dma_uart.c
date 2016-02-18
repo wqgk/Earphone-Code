@@ -220,10 +220,9 @@ void MRT_IRQHandler(void)
  */
 int main(void)
 {
-    int i = 0 ,j = 0;
-    int bytes, idx;
+    int i = 0;
+    int bytes;
 	uint8_t buff[UARTRXBUFFSIZE];
-	uint8_t temp[100] = {0};
     SystemCoreClockUpdate();
     Board_Init();
 
@@ -270,7 +269,7 @@ int main(void)
 	QuickJack_Data_Tx(0x55);
 	QuickJack_Data_Tx(0xAA);
 	QuickJack_Data_Tx(0x55);	
-//	myDelay(3000);
+	myDelay(10);
 	NVIC_DisableIRQ(MRT_IRQn);
     while (1) {
 		/* Sleep until something happens */
@@ -281,11 +280,11 @@ int main(void)
 		if (bytes > 0) {
 			/* RX data received, send it via TX DMA */
 			NVIC_EnableIRQ(MRT_IRQn);
-			for(j = 0; j < 8; j++)
+			for(i = 0; i < 8; i++)
 			{
-//				temp[8 * i + j] = buff[j]; 
-				QuickJack_Data_Tx(buff[j]);
+				QuickJack_Data_Tx(buff[i]);
 			}
+			myDelay(10);
 			NVIC_DisableIRQ(MRT_IRQn);
 		}
     }

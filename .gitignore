@@ -5,6 +5,7 @@
 *.lnp
 *.dep
 *.uvgui.*
+*.uvguix.*
 *.uvopt
 *.o
 *.d
