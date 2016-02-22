@@ -18,17 +18,17 @@
 static volatile int nextTXDesc, countTXDescUsed;
 
 /* Number of UART RX descriptors used for DMA */
-#define UARTRXDESC 2
+#define UARTRXDESC 2    //定义两个描述符
 
 /* Maximum size of each UART RX receive buffer */
-#define UARTRXBUFFSIZE  8
+#define UARTRXBUFFSIZE  8   //定义每次接收字节的个数 然后产生中断
 
 /* UART RX receive buffers */
-static uint8_t dmaRXBuffs[UARTRXDESC][UARTRXBUFFSIZE];
+static uint8_t dmaRXBuffs[UARTRXDESC][UARTRXBUFFSIZE];   //定义二维数组   先将第一次8个字节的数据存在第一个数组，第二次存在第二个数组，不至于覆盖第一个数组
 /* UART receive buffer that is available and availa flag */
 static volatile int uartRXBuff;
 static volatile bool uartRxAvail = false;
-extern volatile uint8_t IdleBit;													// how many times of transfer idle status
+extern volatile uint8_t IdleBit;	// how many times of transfer idle status  定义外部变量，每次开始传输数据的时候，都是这种数据格式：3个空闲位，1个起始位，8个数据位，1个校验位，1个停止位
 /* DMA descriptors must be aligned to 16 bytes */
 ALIGN(16) static DMA_CHDESC_T dmaRXDesc[UARTRXDESC];
 
@@ -265,11 +265,11 @@ int main(void)
        data has been received on the UART in a specified timeout */
     dmaRXQueue();
 	NVIC_EnableIRQ(MRT_IRQn);
-	QuickJack_Data_Tx(0xAA); /* HandShake Protocol AA 55 AA 55 */
+	QuickJack_Data_Tx(0xAA); /* HandShake Protocol AA 55 AA 55 *///握手协议，可以自行更改
 	QuickJack_Data_Tx(0x55);
 	QuickJack_Data_Tx(0xAA);
 	QuickJack_Data_Tx(0x55);	
-	myDelay(10);
+	myDelay(10); //延时的原因，在数据传输完成之后 再关闭中断
 	NVIC_DisableIRQ(MRT_IRQn);
 	IdleBit = 0;
     while (1) {
@@ -287,7 +287,7 @@ int main(void)
 			}
 			myDelay(10);
 			NVIC_DisableIRQ(MRT_IRQn);
-			IdleBit = 0;
+			IdleBit = 0;  
 		}
     }
 }
